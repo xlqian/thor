@@ -358,6 +358,9 @@ TripPath_Edge* TripPathBuilder::AddTripEdge(const uint32_t idx,
   std::vector<std::string> names = edgeinfo->GetNames();
   for (const auto& name : names) {
     trip_edge->add_name(name);
+
+    std::cout << "Greg: " << name << " " << directededge->ctry_crossing() << std::endl;
+
   }
 
   // Set the exits (if the directed edge has exit sign information)
