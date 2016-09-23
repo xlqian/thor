@@ -27,6 +27,7 @@ constexpr uint64_t kInitialEdgeLabelCountBD = 100000;
 BidirectionalAStar::BidirectionalAStar() {
   threshold_ = 0;
   mode_ = TravelMode::kDrive;
+  travel_type_ = 0;
   allow_transitions_ = false;
   adjacencylist_forward_ = nullptr;
   edgestatus_forward_ = nullptr;
@@ -115,6 +116,7 @@ std::vector<PathInfo> BidirectionalAStar::GetBestPath(PathLocation& origin,
   // Set the mode and costing
   mode_ = mode;
   const auto& costing = mode_costing[static_cast<uint32_t>(mode_)];
+  travel_type_ = costing->travel_type();
 
   // Initialize - create adjacency list, edgestatus support, A*, etc.
   Init(origin.edges.front().projected, destination.edges.front().projected,
@@ -667,7 +669,7 @@ std::vector<PathInfo> BidirectionalAStar::FormPath(GraphReader& graphreader) {
   for (auto edgelabel_index = idx1; edgelabel_index != kInvalidLabel;
       edgelabel_index = edgelabels_forward_[edgelabel_index].predecessor()) {
     const EdgeLabel& edgelabel = edgelabels_forward_[edgelabel_index];
-    path.emplace_back(edgelabel.mode(), edgelabel.cost().secs,
+    path.emplace_back(edgelabel.mode(), travel_type_, edgelabel.cost().secs,
                       edgelabel.edgeid(), edgelabel.tripid());
   }
 
@@ -712,7 +714,7 @@ std::vector<PathInfo> BidirectionalAStar::FormPath(GraphReader& graphreader) {
       secs += edgelabel.cost().secs - edgelabels_reverse_[predidx].cost().secs;
     }
     secs += tc;
-    path.emplace_back(edgelabel.mode(), static_cast<uint32_t>(secs),
+    path.emplace_back(edgelabel.mode(), travel_type_, static_cast<uint32_t>(secs),
                             oppedge, edgelabel.tripid());
 
     // Update edgelabel_index and transition cost to apply at next iteration

@@ -169,7 +169,7 @@ namespace valhalla {
         mode = valhalla::sif::TravelMode::kPedestrian;
       } else {
         valhalla::sif::cost_ptr_t cost = get_costing(request, costing);
-        mode = cost->travelmode();
+        mode = cost->travel_mode();
         mode_costing[static_cast<uint32_t>(mode)] = cost;
       }
       valhalla::midgard::logging::Log("travel_mode::" + std::to_string(static_cast<uint32_t>(mode)), " [ANALYTICS] ");
