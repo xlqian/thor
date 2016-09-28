@@ -15,13 +15,16 @@
 #include <valhalla/sif/edgelabel.h>
 #include <valhalla/thor/edgestatus.h>
 #include <valhalla/thor/pathalgorithm.h>
+#include <valhalla/thor/costmatrix.h>
+#include <valhalla/thor/astar.h>
 
 namespace valhalla {
 namespace thor {
 
-constexpr float kMaxCost = 99999999.9999f;
+//constexpr float kMaxCost = 99999999.9999f;
 constexpr float kDefaultCostThreshold = 7200.0f;  // 2 hours
 
+/* 
 // Time and Distance structure
 struct TimeDistance {
   uint32_t time;  // Time in seconds
@@ -36,7 +39,7 @@ struct TimeDistance {
       : time(secs),
         dist(meters) {
   }
-};
+};*/
 
 // Structure to hold time distance results from a thread (for many to many
 // time distance matrix)
@@ -134,6 +137,11 @@ class TimeDistanceMatrix : public PathAlgorithm {
    */
   virtual void Clear();
 
+  virtual std::vector<PathInfo> GetBestPath(baldr::PathLocation& origin,
+          baldr::PathLocation& dest, baldr::GraphReader& graphreader,
+          const std::shared_ptr<sif::DynamicCost>* mode_costing,
+          const sif::TravelMode mode) {
+	  return {}; };
  protected:
   // Number of destinations that have been found and settled (least cost path
   // computed).
@@ -152,6 +160,18 @@ class TimeDistanceMatrix : public PathAlgorithm {
   // has a vector of indexes into the destinations vector
   std::unordered_map<baldr::GraphId, std::vector<uint32_t>> dest_edges_;
 
+  // Vector of edge labels (requires access by index).
+  std::vector<sif::EdgeLabel> edgelabels_;
+
+  // Adjacency list - approximate double bucket sort
+  std::shared_ptr<baldr::DoubleBucketQueue> adjacencylist_;
+
+  // Edge status. Mark edges that are in adjacency list or settled.
+  std::shared_ptr<EdgeStatus> edgestatus_;
+
+  AStarHeuristic astarheuristic_;
+
+  sif::TravelMode mode_;
   /**
    * Sets the origin for a many to one time+distance matrix computation.
    * @param  graphreader   Graph reader for accessing routing graph.
@@ -221,6 +241,8 @@ class TimeDistanceMatrix : public PathAlgorithm {
    * @return  Returns a time distance matrix among locations.
    */
   std::vector<TimeDistance> FormTimeDistanceMatrix();
+
+  void AddToAdjacencyList(const baldr::GraphId& edgeid, const float sortcost);
 };
 
 }
