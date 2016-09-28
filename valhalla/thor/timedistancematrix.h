@@ -21,37 +21,9 @@
 namespace valhalla {
 namespace thor {
 
-//constexpr float kMaxCost = 99999999.9999f;
 constexpr float kDefaultCostThreshold = 7200.0f;  // 2 hours
 
-/* 
-// Time and Distance structure
-struct TimeDistance {
-  uint32_t time;  // Time in seconds
-  uint32_t dist;  // Distance in meters
 
-  TimeDistance()
-      : time(0),
-        dist(0) {
-  }
-
-  TimeDistance(const uint32_t secs, const uint32_t meters)
-      : time(secs),
-        dist(meters) {
-  }
-};*/
-
-// Structure to hold time distance results from a thread (for many to many
-// time distance matrix)
-struct TimeDistanceResults {
-  uint32_t origin_index;  // Origin index of the one to many result
-  std::vector<TimeDistance> time_distance;
-
-  // Sorting method to sort by origin_index
-  bool operator < (const TimeDistanceResults& other) const {
-    return origin_index < other.origin_index;
-  }
-};
 
 // Structure to hold information about each destination.
 struct Destination {
@@ -76,7 +48,7 @@ struct Destination {
 };
 
 // Class to compute time + distance matrices among locations.
-class TimeDistanceMatrix : public PathAlgorithm {
+class TimeDistanceMatrix {
  public:
   /**
    * Constructor with cost threshold.
@@ -135,13 +107,8 @@ class TimeDistanceMatrix : public PathAlgorithm {
    * Clear the temporary information generated during time+distance
    * matrix construction.
    */
-  virtual void Clear();
+  void Clear();
 
-  virtual std::vector<PathInfo> GetBestPath(baldr::PathLocation& origin,
-          baldr::PathLocation& dest, baldr::GraphReader& graphreader,
-          const std::shared_ptr<sif::DynamicCost>* mode_costing,
-          const sif::TravelMode mode) {
-	  return {}; };
  protected:
   // Number of destinations that have been found and settled (least cost path
   // computed).
