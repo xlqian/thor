@@ -659,8 +659,7 @@ TripPath TripPathBuilder::Build(GraphReader& graphreader,
 
     // Get the shape and set shape indexes (directed edge forward flag
     // determines whether shape is traversed forward or reverse).
-    std::unique_ptr<const EdgeInfo> edgeinfo = graphtile->edgeinfo(
-        directededge->edgeinfo_offset());
+    auto edgeinfo = graphtile->edgeinfo(directededge->edgeinfo_offset());
     if (is_first_edge) {
       trip_edge->set_begin_shape_index(0);
     } else {
@@ -821,8 +820,7 @@ TripPath_Edge* TripPathBuilder::AddTripEdge(const uint32_t idx,
   TripPath_Edge* trip_edge = trip_node->mutable_edge();
 
   // Get the edgeinfo and list of names - add to the trip edge.
-  std::unique_ptr<const EdgeInfo> edgeinfo = graphtile->edgeinfo(
-      directededge->edgeinfo_offset());
+  auto edgeinfo = graphtile->edgeinfo(directededge->edgeinfo_offset());
   std::vector<std::string> names = edgeinfo->GetNames();
   for (const auto& name : names) {
     trip_edge->add_name(name);
