@@ -667,6 +667,13 @@ void Isochrone::UpdateIsoTile(const EdgeLabel& pred, GraphReader& graphreader,
       return;
   }
 
+  // Get the DirectedEdge because we'll need its shape
+  const GraphTile* tile = graphreader.GetGraphTile(pred.edgeid().Tile_Base());
+  const DirectedEdge* edge = tile->directededge(pred.edgeid());
+  // Transit lines can't really be "reached" you really just pass through those cells
+  if(edge->IsTransitLine())
+    return;
+
   // Get time at the end node of the predecessor
   float secs1 = pred.cost().secs;
 
@@ -680,10 +687,8 @@ void Isochrone::UpdateIsoTile(const EdgeLabel& pred, GraphReader& graphreader,
     secs0 = edgelabels_[predindex].cost().secs;
   }
 
-  // Get the directed edge and its shape. Make sure shape is forward
+  // Get the shape and make sure shape is forward
   // direction and resample it to the shape interval.
-  const GraphTile* tile = graphreader.GetGraphTile(pred.edgeid().Tile_Base());
-  const DirectedEdge* edge = tile->directededge(pred.edgeid());
   auto shape = tile->edgeinfo(edge->edgeinfo_offset())->shape();
   if (!edge->forward()) {
     std::reverse(shape.begin(), shape.end());
