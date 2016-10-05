@@ -12,6 +12,7 @@
 #include <valhalla/baldr/signinfo.h>
 #include <valhalla/baldr/graphconstants.h>
 #include <valhalla/midgard/pointll.h>
+#include <valhalla/midgard/encoded.h>
 #include <valhalla/midgard/logging.h>
 #include <valhalla/sif/costconstants.h>
 
